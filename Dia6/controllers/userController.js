@@ -4,6 +4,8 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import UserModel from "../models/UserModel";
+import dotenv from "dotenv";
+dotenv.config();
 
 export default class UserController{
     constructor(){
@@ -67,7 +69,34 @@ export default class UserController{
         }
     }
 
-    
+    async updateUser(req,res){
+        try{
+            const {id} = req.user;//Este dato lo tomará directamente del token
+            const {name,email}= req.body;
 
+            await this.userModel.updateUser(id,{name,email});
+            res.status(200).json({
+                msg:"Usuario actualizado con éxito!!!"
+            });
+        }
+        catch(err){
+            res.status(500).json({error:err.message});
+        }
+    }
 
+    async updatePassword(req,res){
+            try{
+                const {id} = req.user;//Este dato lo tomará directamente del token
+                const {password}= req.body;
+
+                const hashedPassword = await bcrypt.hash(password,10);
+                await this.userModel.updateUser(id,{password:hashedPassword});
+                res.status(200).json({
+                    msg:"Contraseña actualizada con éxito!!!"
+                });
+            }
+            catch(err){
+                res.status(500).json({error:err.message});
+            }
+        }
 }
