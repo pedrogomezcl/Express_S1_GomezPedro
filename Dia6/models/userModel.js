@@ -23,6 +23,15 @@ export default class UserModel {
     }
     async findUserByEmail(email){
         const collection = await this.connect();
-        
+        return await collection.findOne({email});
     }
+
+    async updateUser(id,newData){
+        const collection = await this.connect();
+        return await collection.updateOne({
+            _id: new ObjectId(id)
+        },{$set:newData})
+    };
+
+
 }
