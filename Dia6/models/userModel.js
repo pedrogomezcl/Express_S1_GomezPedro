@@ -5,17 +5,17 @@ dotenv.config();
 export default class UserModel {
     constructor() {
         this.client = new MongoClient(process.env.MONGO_URI);
-        this.dbName = process.env.MONGO_DB
+        this.dbName = process.env.MONGO_DB;
     }
 
 
 
 
     async connect() {
-        if (db) return db; //Retorna la variable si tiene alguna conexión
-        await this.client.connect(); //Abre la conexión
-        db = this.client.db(this.dbName);//Selecciona y anida la BBDD
-        return db.collection("users"); // Retorna la conexión anidada a la BBDD con la coleccion users
+        if(!this.client.topology?.isConnected()){
+            await this.client.connect();
+        }
+        return this.client.db(this.dbName).collection("users");
     }
     async createUser(userData){
         const collection = await this.connect();

@@ -1,6 +1,6 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-import UserController from "../controllers/userController";
+import UserController from "../controllers/userController.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -22,5 +22,10 @@ function authMiddleware(req,res,next){
 }
 
 //Rutas públicas
+router.post("/register",(req,res)=> userController.register(req,res));
+router.delete("/login",(req,res)=> userController.login(req,res));
+//Rutas protegidas
+router.put("/update",authMiddleware,(req,res)=> userController.updateUser(req,res));
+router.put("/update-password",authMiddleware,(req,res)=>userController.updatePassword(req,res));
 
-//
+export default router;
