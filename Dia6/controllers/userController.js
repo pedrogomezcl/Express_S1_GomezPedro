@@ -17,7 +17,7 @@ export default class UserController{
             const existingUser = await this.userModel.findUserByEmail(email);
 
             if(existingUser){
-                res.status(400).json({
+               return res.status(400).json({
                     msg:"El usuario ya existe"
                 });
             }
@@ -38,17 +38,36 @@ export default class UserController{
 
     async login(req,res){
         try{
-            const {name,email,password} = req.body;
+            const {email,password} = req.body;
             const existingUser = await this.userModel.findUserByEmail(email);
 
             if(!existingUser){
-                res.status(404).json({
+                return res.status(404).json({
                     msg:"El usuario no existe"
                 });
             }
+
+            const validPassword = await bcrypt.compare(password,existingUser.password);//Verificar que la contraseña sea verdadera -- NUNCA
+            if(!validPassword){
+                return res.status(401).json({
+                    msg:"La contraseña es inválida!"
+                });
+            }
+
+            const token= jwt.sign({id:existingUser._id},process.env.JWT_SECRET,{
+                expiresIn:process.env.JWT_EXPIRES
+            });
+            res.status(202).json({
+                msg:"Login exitoso",
+                token
+            });
         }
-        catch(err){}
+        catch(err){
+             res.status(500).json({error:err.message});
+        }
     }
+
+    
 
 
 }
